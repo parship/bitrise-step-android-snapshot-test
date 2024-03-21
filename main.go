@@ -51,7 +51,7 @@ func main() {
 		failf("Process config: failed to open project, error: %s", err)
 	}
 
-	testTask := gradleProject.GetTask("test")
+	testTask := gradleProject.GetTask("verifyPaparazzi")
 
 	args, err := shellquote.Split(config.Arguments)
 	if err != nil {
