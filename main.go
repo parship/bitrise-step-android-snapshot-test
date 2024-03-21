@@ -5,9 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/bitrise-io/go-android/cache"
 	"github.com/bitrise-io/go-android/gradle"
-	utilscache "github.com/bitrise-io/go-steputils/cache"
 	"github.com/bitrise-io/go-steputils/stepconf"
 	"github.com/bitrise-io/go-utils/command"
 	"github.com/bitrise-io/go-utils/env"
@@ -46,7 +44,7 @@ func main() {
 	stepconf.Print(config)
 	fmt.Println()
 
-	logger.EnableDebugLog(config.IsDebug)
+	// logger.EnableDebugLog(config.IsDebug)
 
 	gradleProject, err := gradle.NewProject(config.ProjectLocation, cmdFactory)
 	if err != nil {
@@ -108,10 +106,6 @@ func main() {
 	}
 
 	fmt.Println()
-	logger.Infof("Collecting cache:")
-	if warning := cache.Collect(config.ProjectLocation, utilscache.Level(config.CacheLevel), cmdFactory); warning != nil {
-		logger.Warnf("%s", warning)
-	}
 	logger.Donef("  Done")
 }
 
