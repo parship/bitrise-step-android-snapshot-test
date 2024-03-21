@@ -1,0 +1,67 @@
+title: |-
+  Android Paparazzi
+summary: |
+  This step runs your Android project's paparazzi tests.
+description: |
+  This step runs your Android project's paparazzi tests.
+website: https://parship.de
+source_code_url: https://parship.de
+support_url: https://parship.de
+
+project_type_tags:
+  - android
+
+type_tags:
+  - test
+
+toolkit:
+  go:
+    package_name: github.com/parship/bitrise-step-android-paparazzi-test
+
+inputs:
+  - project_location: $BITRISE_SOURCE_DIR
+    opts:
+      title: Project Location
+      summary: "The root directory of your android project, for example, where your root build gradle file exists (also gradlew, settings.gradle, etc...)"
+      description: "The root directory of your android project, for example, where your root build gradle file exists (also gradlew, settings.gradle, etc...)"
+      is_required: true
+
+  - module: ""
+    opts:
+      title: Module
+      summary: |
+        Set the module that you want to test.
+      description: |
+        Set the module that you want to test.  
+        To see your available modules, please open your project in Android Studio, go to **Project Structure** and see the list on the left.  
+        Leave this input blank to test all modules.
+      is_required: false
+
+  - variant: ""
+    opts:
+      title: Variant
+      summary: |
+        Set the variant that you want to test.
+      description: |
+        Set the variant that you want to test.  
+        To see your available variants, please open your project in Android Studio, go to **Project Structure**, then to the **variants** section.  
+        Leave this input blank to test all variants.
+      is_required: false
+
+  - arguments:
+    opts:
+      category: Options
+      title: Additional Gradle Arguments 
+      summary: Extra arguments passed to the gradle task
+      description: Extra arguments passed to the gradle task
+      is_required: false
+
+outputs:
+  - EXAMPLE_STEP_OUTPUT:
+    opts:
+      title: "Example Step Output"
+      summary: Summary. No more than 2-3 sentences.
+      description: |
+        Description of this output.
+
+        Can be Markdown formatted text.
