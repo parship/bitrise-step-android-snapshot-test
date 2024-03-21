@@ -24,8 +24,8 @@ type Configs struct {
 	Variant              string `env:"variant"`
 	Module               string `env:"module"`
 	Arguments            string `env:"arguments"`
-	CacheLevel           string `env:"cache_level,opt[none,only_deps,all]"`
-	IsDebug              bool   `env:"is_debug,opt[true,false]"`
+	//CacheLevel           string `env:"cache_level,opt[none,only_deps,all]"`
+	// IsDebug              bool   `env:"is_debug,opt[true,false]"`
 
 	DeployDir     string `env:"BITRISE_DEPLOY_DIR"`
 	TestResultDir string `env:"BITRISE_TEST_RESULT_DIR"`
