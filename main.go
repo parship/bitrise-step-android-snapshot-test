@@ -52,6 +52,7 @@ func main() {
 	}
 
 	testTask := gradleProject.GetTask("verifyPaparazzi")
+	fmt.Println(testTask)
 
 	args, err := shellquote.Split(config.Arguments)
 	if err != nil {
