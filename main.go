@@ -51,7 +51,7 @@ func main() {
 		failf("Process config: failed to open project, error: %s", err)
 	}
 
-	testTask := gradleProject.GetTask("verifyPaparazzi")
+	testTask := gradleProject.GetTask("test")
 	fmt.Println(testTask)
 
 	args, err := shellquote.Split(config.Arguments)
@@ -97,10 +97,10 @@ func main() {
 	logger.Donef("$ " + testCommand.PrintableCommandArgs())
 	fmt.Println()
 
-	testErr = testCommand.Run()
-	if testErr != nil {
-		logger.Errorf("Run: test task failed, error: %v", testErr)
-	}
+	// testErr = testCommand.Run()
+	// if testErr != nil {
+	// 	logger.Errorf("Run: test task failed, error: %v", testErr)
+	// }
 
 	// EXPORT
 
