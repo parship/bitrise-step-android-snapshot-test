@@ -51,7 +51,7 @@ func main() {
 		failf("Process config: failed to open project, error: %s", err)
 	}
 
-	testTask := gradleProject.GetTask("test")
+	testTask := gradleProject.GetTask("verifySnapshots")
 	fmt.Println(testTask)
 
 	args, err := shellquote.Split(config.Arguments)
