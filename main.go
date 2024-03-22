@@ -66,11 +66,13 @@ func main() {
 	if err != nil {
 		failf("Run: failed to fetch variants, error: %s", err)
 	}
+	fmt.Println(variants)
 
 	filteredVariants, err := filterVariants(config.Module, config.Variant, variants)
 	if err != nil {
 		failf("Run: failed to find buildable variants, error: %s", err)
 	}
+	fmt.Println(filteredVariants)
 
 	for module, variants := range variants {
 		logger.Printf("%s:", module)
