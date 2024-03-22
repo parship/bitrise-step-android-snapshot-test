@@ -134,7 +134,7 @@ func filterVariants(module, variant string, variantsMap gradle.Variants) (gradle
 	for m, variants := range variantsMap {
 		for _, v := range variants {
 			fmt.Println(v)
-			if v == "verifySnapshots"+variant {
+			if v == variant {
 				filteredVariants[m] = append(filteredVariants[m], v)
 			}
 		}
