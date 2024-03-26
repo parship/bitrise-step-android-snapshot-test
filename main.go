@@ -39,13 +39,19 @@ func main() {
 
 	project := getProject(config)
 
-	command := createCommand(config, project)
+	testTask := project.GetTask("verifySnapshots")
+
+	args := getArgs(config)
+
+	variants := getVariants(config, *testTask, args)
+
+	command := testTask.GetCommand(variants, args...)
 
 	started := time.Now()
 
 	testErr := runTest(command)
 
-	exportResult(project, config, started)
+	exportResult(project, config, started, variants)
 
 	// FINISH
 	if testErr != nil {
@@ -53,13 +59,13 @@ func main() {
 	}
 }
 
-func exportResult(project gradle.Project, config Configs, started time.Time) {
+func exportResult(project gradle.Project, config Configs, started time.Time, variantMap gradle.Variants) {
 	// HTML RESULTS
 	fmt.Println()
 	logger.Infof("Export HTML results:")
 	fmt.Println()
 
-	reports, err := getArtifacts(project, started, config.HTMLResultDirPattern, true, true)
+	reports, err := getArtifacts(variantMap, project, started, config.HTMLResultDirPattern, true, true)
 	if err != nil {
 		failf("Export outputs: failed to find reports, error: %v", err)
 	}
@@ -73,7 +79,7 @@ func exportResult(project gradle.Project, config Configs, started time.Time) {
 	logger.Infof("Export XML results:")
 	fmt.Println()
 
-	results, err := getArtifacts(project, started, config.XMLResultDirPattern, true, true)
+	results, err := getArtifacts(variantMap, project, started, config.XMLResultDirPattern, true, true)
 	if err != nil {
 		failf("Export outputs: failed to find results, error: %v", err)
 	}
@@ -87,7 +93,7 @@ func exportResult(project gradle.Project, config Configs, started time.Time) {
 	logger.Infof("Export Snapshot results:")
 	fmt.Println()
 
-	snapshotResult, err := getArtifacts(project, started, config.SnapshotDeltaDirPattern, true, true)
+	snapshotResult, err := getArtifacts(variantMap, project, started, config.SnapshotDeltaDirPattern, true, true)
 	if snapshotResult != nil {
 		failf("Export outputs: failed to find results, error: %v", err)
 	}
@@ -109,6 +115,22 @@ func createConfig() Configs {
 	fmt.Println()
 
 	return config
+}
+
+func getVariants(config Configs, task gradle.Task, args []string) gradle.Variants {
+	variants, err := task.GetVariants(args...)
+	if err != nil {
+		failf("Run: failed to fetch variants, error: %s", err)
+	}
+
+	filteredVariants, err := filterVariants(config.Module, config.Variant, variants)
+	if err != nil {
+		failf("Run: failed to find buildable variants, error: %s", err)
+	}
+
+	logVariants(variants, filteredVariants)
+
+	return filteredVariants
 }
 
 func runTest(command command.Command) error {
@@ -137,27 +159,13 @@ func getProject(config Configs) gradle.Project {
 	return project
 }
 
-func createCommand(config Configs, project gradle.Project) command.Command {
-	testTask := project.GetTask("verifySnapshots")
-
+func getArgs(config Configs) []string {
 	args, err := shellquote.Split(config.Arguments)
 	if err != nil {
 		failf("Process config: failed to parse arguments, error: %s", err)
 	}
 
-	variants, err := testTask.GetVariants(args...)
-	if err != nil {
-		failf("Run: failed to fetch variants, error: %s", err)
-	}
-
-	filteredVariants, err := filterVariants(config.Module, config.Variant, variants)
-	if err != nil {
-		failf("Run: failed to find buildable variants, error: %s", err)
-	}
-
-	logVariants(variants, filteredVariants)
-
-	return testTask.GetCommand(filteredVariants, args...)
+	return args
 }
 
 func logVariants(variants gradle.Variants, filteredVariants gradle.Variants) {
