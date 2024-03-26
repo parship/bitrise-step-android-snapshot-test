@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"strings"
 
 	"github.com/bitrise-io/go-android/gradle"
 	"github.com/bitrise-io/go-steputils/stepconf"
@@ -22,8 +21,6 @@ type Configs struct {
 	Variant              string `env:"variant"`
 	Module               string `env:"module"`
 	Arguments            string `env:"arguments"`
-	//CacheLevel           string `env:"cache_level,opt[none,only_deps,all]"`
-	// IsDebug              bool   `env:"is_debug,opt[true,false]"`
 
 	DeployDir     string `env:"BITRISE_DEPLOY_DIR"`
 	TestResultDir string `env:"BITRISE_TEST_RESULT_DIR"`
@@ -36,79 +33,75 @@ func main() {
 	var config Configs
 
 	fmt.Println(config)
-
 	if err := stepconf.Parse(&config); err != nil {
 		failf("Process config: couldn't create step config: %v\n", err)
 	}
-
 	stepconf.Print(config)
 	fmt.Println()
 
-	// logger.EnableDebugLog(config.IsDebug)
+	command := createCommand(config)
 
-	gradleProject, err := gradle.NewProject(config.ProjectLocation, cmdFactory)
+	runTest(command)
+}
+
+func runTest(command command.Command) {
+	var testErr error
+	logger.Infof("Run test:")
+	fmt.Println()
+
+	logger.Donef("$ " + command.PrintableCommandArgs())
+
+	fmt.Println()
+
+	testErr = command.Run()
+	if testErr != nil {
+		logger.Errorf("Run: test task failed, error: %v", testErr)
+	}
+}
+
+func createCommand(config Configs) command.Command {
+	project, err := gradle.NewProject(config.ProjectLocation, cmdFactory)
 	if err != nil {
 		failf("Process config: failed to open project, error: %s", err)
 	}
 
-	testTask := gradleProject.GetTask("verifySnapshots")
-	fmt.Println(testTask)
+	testTask := project.GetTask("verifySnapshots")
 
 	args, err := shellquote.Split(config.Arguments)
 	if err != nil {
 		failf("Process config: failed to parse arguments, error: %s", err)
 	}
 
-	logger.Infof("Variants:")
-	fmt.Println()
-
 	variants, err := testTask.GetVariants(args...)
 	if err != nil {
 		failf("Run: failed to fetch variants, error: %s", err)
 	}
-	fmt.Println(variants)
 
 	filteredVariants, err := filterVariants(config.Module, config.Variant, variants)
 	if err != nil {
 		failf("Run: failed to find buildable variants, error: %s", err)
 	}
-	fmt.Println(filteredVariants)
+
+	logVariants(variants, filteredVariants)
+
+	return testTask.GetCommand(filteredVariants, args...)
+}
+
+func logVariants(variants gradle.Variants, filteredVariants gradle.Variants) {
+	logger.Infof("Variants:")
+	fmt.Println()
 
 	for module, variants := range variants {
 		logger.Printf("%s:", module)
 		for _, variant := range variants {
 			if sliceutil.IsStringInSlice(variant, filteredVariants[module]) {
-				logger.Donef("✓ %s", strings.TrimSuffix(variant, "UnitTest"))
+				logger.Donef("✓ %s", variant)
 			} else {
-				logger.Printf("- %s", strings.TrimSuffix(variant, "UnitTest"))
+				logger.Printf("- %s", variant)
 			}
 		}
 	}
 	fmt.Println()
-
-	// started := time.Now()
-
-	var testErr error
-
-	logger.Infof("Run test:")
-	testCommand := testTask.GetCommand(filteredVariants, args...)
-
-	fmt.Println()
-	logger.Donef("$ " + testCommand.PrintableCommandArgs())
-	fmt.Println()
-
-	testErr = testCommand.Run()
-	if testErr != nil {
-		logger.Errorf("Run: test task failed, error: %v", testErr)
-	}
-
-	// EXPORT
-	if testErr != nil {
-		os.Exit(1)
-	}
-
-	fmt.Println()
-	logger.Donef("  Done")
 }
 
 func failf(f string, args ...interface{}) {
