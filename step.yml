@@ -56,7 +56,7 @@ inputs:
       description: Extra arguments passed to the gradle task
       is_required: false
 
-  - report_path_pattern: "*build/reports/tests"
+  - report_path_pattern: "build/reports/tests"
     opts:
       category: Options
       title: Local unit test HTML result directory pattern
@@ -65,7 +65,7 @@ inputs:
         The whole HTML results directory will be zipped and moved to the `$BITRISE_DEPLOY_DIR`.
       is_required: true
 
-  - result_path_pattern: "*build/test-results"
+  - result_path_pattern: "build/test-results"
     opts:
       category: Options
       title: Local unit test XML result directory pattern
@@ -75,7 +75,7 @@ inputs:
         and the result files will be deployed to the Ship Addon.
       is_required: true
 
-  - delta_path_pattern: "*build/paparazzi/failures"
+  - delta_path_pattern: "build/paparazzi/failures"
     opts:
       category: Options
       title: Local snapshot test failure directory pattern
