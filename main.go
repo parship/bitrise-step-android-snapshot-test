@@ -47,11 +47,9 @@ func main() {
 
 	command := testTask.GetCommand(variants, args...)
 
-	started := time.Now()
-
 	testErr := runTest(command)
 
-	exportResult(project, config, started, variants)
+	exportResult(config, variants)
 
 	// FINISH
 	if testErr != nil {
@@ -59,13 +57,13 @@ func main() {
 	}
 }
 
-func exportResult(project gradle.Project, config Configs, started time.Time, variantMap gradle.Variants) {
+func exportResult(config Configs, variantMap gradle.Variants) {
 	// HTML RESULTS
 	fmt.Println()
 	logger.Infof("Export HTML results:")
 	fmt.Println()
 
-	reports, err := getArtifacts(config, variantMap, project, started, config.HTMLResultDirPattern, true)
+	reports, err := getArtifacts(config, variantMap, config.HTMLResultDirPattern)
 	if err != nil {
 		failf("Export outputs: failed to find reports, error: %v", err)
 	}
@@ -225,22 +223,34 @@ func workDirRel(pth string) (string, error) {
 	return filepath.Rel(wd, pth)
 }
 
-func getArtifacts(config Configs, variantsMap gradle.Variants, proj gradle.Project, started time.Time, pattern string, includeModuleName bool) (artifacts []gradle.Artifact, err error) {
+func getArtifacts(config Configs, variantsMap gradle.Variants, pattern string) (artifacts []gradle.Artifact, err error) {
 	var a []gradle.Artifact
 
-	for m, _ := range variantsMap {
-		modulePath := strings.Replace(m, ":", "/", -1)
+	for module := range variantsMap {
+		modulePath := strings.Replace(module, ":", "/", -1)
 		fullPath := config.ProjectLocation + "/" + modulePath + "/" + pattern
 		fmt.Println("Checking: " + fullPath)
 
-		// name, err := proj.extractArtifactName(fullPath, includeModuleName)
-		// if err != nil {
-		// 	return err
-		// }
-		a = append(a, gradle.Artifact{Name: "Test", Path: fullPath})
+		name, err := extractArtifactName(config.ProjectLocation, fullPath)
+		if err == nil {
+			a = append(a, gradle.Artifact{Name: name, Path: fullPath})
+		}
 	}
 
 	return a, nil
+}
+
+func extractArtifactName(projectPath string, path string) (string, error) {
+	relPath, err := filepath.Rel(projectPath, path)
+	if err != nil {
+		return "", err
+	}
+
+	fileName := filepath.Base(relPath)
+
+	fileName = strings.Split(relPath, "/")[0] + "-" + fileName
+
+	return fileName, nil
 }
 
 func exportArtifacts(deployDir string, artifacts []gradle.Artifact) error {
