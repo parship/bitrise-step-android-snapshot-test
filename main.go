@@ -230,7 +230,7 @@ func getArtifacts(config Configs, variantsMap gradle.Variants, proj gradle.Proje
 
 	for m, _ := range variantsMap {
 		modulePath := strings.Replace(m, ":", "/", -1)
-		fullPath := config.ProjectLocation + modulePath + "/" + pattern
+		fullPath := config.ProjectLocation + "/" + modulePath + "/" + pattern
 		fmt.Println("Checking: " + fullPath)
 
 		// name, err := proj.extractArtifactName(fullPath, includeModuleName)
