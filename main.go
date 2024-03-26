@@ -65,7 +65,7 @@ func exportResult(project gradle.Project, config Configs, started time.Time, var
 	logger.Infof("Export HTML results:")
 	fmt.Println()
 
-	reports, err := getArtifacts(variantMap, project, started, config.HTMLResultDirPattern, true, true)
+	reports, err := getArtifacts(config, variantMap, project, started, config.HTMLResultDirPattern, true)
 	if err != nil {
 		failf("Export outputs: failed to find reports, error: %v", err)
 	}
@@ -74,33 +74,33 @@ func exportResult(project gradle.Project, config Configs, started time.Time, var
 		failf("Export outputs: failed to export reports, error: %v", err)
 	}
 
-	// XML RESULTS
-	fmt.Println()
-	logger.Infof("Export XML results:")
-	fmt.Println()
+	// // XML RESULTS
+	// fmt.Println()
+	// logger.Infof("Export XML results:")
+	// fmt.Println()
 
-	results, err := getArtifacts(variantMap, project, started, config.XMLResultDirPattern, true, true)
-	if err != nil {
-		failf("Export outputs: failed to find results, error: %v", err)
-	}
+	// results, err := getArtifacts(variantMap, project, started, config.XMLResultDirPattern, true, true)
+	// if err != nil {
+	// 	failf("Export outputs: failed to find results, error: %v", err)
+	// }
 
-	if err := exportArtifacts(config.DeployDir, results); err != nil {
-		failf("Export outputs: failed to export results, error: %v", err)
-	}
+	// if err := exportArtifacts(config.DeployDir, results); err != nil {
+	// 	failf("Export outputs: failed to export results, error: %v", err)
+	// }
 
-	// SNAPSHOT RESULTS
-	fmt.Println()
-	logger.Infof("Export Snapshot results:")
-	fmt.Println()
+	// // SNAPSHOT RESULTS
+	// fmt.Println()
+	// logger.Infof("Export Snapshot results:")
+	// fmt.Println()
 
-	snapshotResult, err := getArtifacts(variantMap, project, started, config.SnapshotDeltaDirPattern, true, true)
-	if snapshotResult != nil {
-		failf("Export outputs: failed to find results, error: %v", err)
-	}
+	// snapshotResult, err := getArtifacts(variantMap, project, started, config.SnapshotDeltaDirPattern, true, true)
+	// if snapshotResult != nil {
+	// 	failf("Export outputs: failed to find results, error: %v", err)
+	// }
 
-	if err := exportArtifacts(config.DeployDir, results); err != nil {
-		failf("Export outputs: failed to export results, error: %v", err)
-	}
+	// if err := exportArtifacts(config.DeployDir, results); err != nil {
+	// 	failf("Export outputs: failed to export results, error: %v", err)
+	// }
 
 }
 
@@ -225,16 +225,19 @@ func workDirRel(pth string) (string, error) {
 	return filepath.Rel(wd, pth)
 }
 
-func getArtifacts(variantsMap gradle.Variants, proj gradle.Project, started time.Time, pattern string, includeModuleName bool, isDirectoryMode bool) (artifacts []gradle.Artifact, err error) {
+func getArtifacts(config Configs, variantsMap gradle.Variants, proj gradle.Project, started time.Time, pattern string, includeModuleName bool) (artifacts []gradle.Artifact, err error) {
 	var a []gradle.Artifact
 
 	for m, _ := range variantsMap {
-		patternWithVolume := m + "/" + pattern
-		fmt.Println("Checking: " + patternWithVolume)
+		modulePath := strings.Replace(m, ":", "/", -1)
+		fullPath := config.ProjectLocation + modulePath + "/" + pattern
+		fmt.Println("Checking: " + fullPath)
 
-		moduleA, _ := proj.FindDirs(started, patternWithVolume, includeModuleName)
-
-		a = append(a, moduleA...)
+		// name, err := proj.extractArtifactName(fullPath, includeModuleName)
+		// if err != nil {
+		// 	return err
+		// }
+		a = append(a, gradle.Artifact{Name: "Test", Path: fullPath})
 	}
 
 	return a, nil
