@@ -97,13 +97,12 @@ func main() {
 	logger.Donef("$ " + testCommand.PrintableCommandArgs())
 	fmt.Println()
 
-	// testErr = testCommand.Run()
-	// if testErr != nil {
-	// 	logger.Errorf("Run: test task failed, error: %v", testErr)
-	// }
+	testErr = testCommand.Run()
+	if testErr != nil {
+		logger.Errorf("Run: test task failed, error: %v", testErr)
+	}
 
 	// EXPORT
-
 	if testErr != nil {
 		os.Exit(1)
 	}
