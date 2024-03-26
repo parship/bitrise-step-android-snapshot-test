@@ -36,7 +36,7 @@ var logger = log.NewLogger()
 func main() {
 	config := createConfig()
 
-	project := getProject()
+	project := getProject(config)
 
 	command := createCommand(config, project)
 
@@ -97,7 +97,7 @@ func runTest(command command.Command) error {
 	return testErr
 }
 
-func getProject() gradle.Project {
+func getProject(config Configs) gradle.Project {
 	project, err := gradle.NewProject(config.ProjectLocation, cmdFactory)
 	if err != nil {
 		failf("Process config: failed to open project, error: %s", err)
