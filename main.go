@@ -217,28 +217,19 @@ func workDirRel(pth string) (string, error) {
 	return filepath.Rel(wd, pth)
 }
 
-func getArtifacts(gradleProject gradle.Project, started time.Time, pattern string, includeModuleName bool, isDirectoryMode bool) (artifacts []gradle.Artifact, err error) {
-	for _, t := range []time.Time{started, {}} {
-		if isDirectoryMode {
-			artifacts, err = gradleProject.FindDirs(t, pattern, includeModuleName)
-		} else {
-			artifacts, err = gradleProject.FindArtifacts(t, pattern, includeModuleName)
-		}
-		if err != nil {
-			return
-		}
-		if len(artifacts) == 0 {
-			if t == started {
-				logger.Warnf("No artifacts found with pattern: %s that has modification time after: %s", pattern, t)
-				logger.Warnf("Retrying without modtime check....")
-				fmt.Println()
-				continue
-			}
-			logger.Warnf("No artifacts found with pattern: %s without modtime check", pattern)
-			logger.Warnf("If you have changed default report export path in your gradle files then you might need to change ReportPathPattern accordingly.")
-		}
+func getArtifacts(variantsMap gradle.Variants, proj gradle.Project, started time.Time, pattern string, includeModuleName bool, isDirectoryMode bool) (artifacts []gradle.Artifact, err error) {
+	var a []gradle.Artifact
+
+	for m, _ := range variantsMap {
+		patternWithVolume := m + "/" + pattern
+		fmt.Println("Checking: " + patternWithVolume)
+
+		moduleA, _ := proj.FindDirs(started, patternWithVolume, includeModuleName)
+
+		a = append(a, moduleA...)
 	}
-	return
+
+	return a, nil
 }
 
 func exportArtifacts(deployDir string, artifacts []gradle.Artifact) error {
