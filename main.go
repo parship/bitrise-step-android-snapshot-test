@@ -82,6 +82,20 @@ func exportResult(project gradle.Project, config Configs, started time.Time) {
 		failf("Export outputs: failed to export results, error: %v", err)
 	}
 
+	// SNAPSHOT RESULTS
+	fmt.Println()
+	logger.Infof("Export Snapshot results:")
+	fmt.Println()
+
+	snapshotResult, err := getArtifacts(project, started, config.SnapshotDeltaDirPattern, true, true)
+	if snapshotResult != nil {
+		failf("Export outputs: failed to find results, error: %v", err)
+	}
+
+	if err := exportArtifacts(config.DeployDir, results); err != nil {
+		failf("Export outputs: failed to export results, error: %v", err)
+	}
+
 }
 
 func createConfig() Configs {
