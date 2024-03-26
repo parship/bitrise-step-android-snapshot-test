@@ -56,6 +56,25 @@ inputs:
       description: Extra arguments passed to the gradle task
       is_required: false
 
+  - report_path_pattern: "*build/reports/tests"
+    opts:
+      category: Options
+      title: Local unit test HTML result directory pattern
+      description: |-
+        The step will use this pattern to export __Local unit test HTML results__.  
+        The whole HTML results directory will be zipped and moved to the `$BITRISE_DEPLOY_DIR`.
+      is_required: true
+
+  - result_path_pattern: "*build/test-results"
+    opts:
+      category: Options
+      title: Local unit test XML result directory pattern
+      description: |-
+        The step will use this pattern to export __Local unit test XML results__.  
+        The whole XML results directory will be zipped and moved to the `$BITRISE_DEPLOY_DIR`  
+        and the result files will be deployed to the Ship Addon.
+      is_required: true
+
 outputs:
   - EXAMPLE_STEP_OUTPUT:
     opts:
