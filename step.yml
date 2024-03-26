@@ -75,6 +75,14 @@ inputs:
         and the result files will be deployed to the Ship Addon.
       is_required: true
 
+  - delta_path_pattern: "*build/paparazzi/failures/"
+     opts:
+      category: Options
+      title: Local snapshot test failure directory pattern
+      description: |-
+        The step will use this pattern to export __Local snapshot test failures__.  
+      is_required: true
+
 outputs:
   - EXAMPLE_STEP_OUTPUT:
     opts:

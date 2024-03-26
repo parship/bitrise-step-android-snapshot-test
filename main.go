@@ -19,12 +19,13 @@ import (
 
 // Configs ...
 type Configs struct {
-	ProjectLocation      string `env:"project_location,dir"`
-	HTMLResultDirPattern string `env:"report_path_pattern"`
-	XMLResultDirPattern  string `env:"result_path_pattern"`
-	Variant              string `env:"variant"`
-	Module               string `env:"module"`
-	Arguments            string `env:"arguments"`
+	ProjectLocation         string `env:"project_location,dir"`
+	HTMLResultDirPattern    string `env:"report_path_pattern"`
+	XMLResultDirPattern     string `env:"result_path_pattern"`
+	SnapshotDeltaDirPattern string `env:"delta_path_pattern"`
+	Variant                 string `env:"variant"`
+	Module                  string `env:"module"`
+	Arguments               string `env:"arguments"`
 
 	DeployDir     string `env:"BITRISE_DEPLOY_DIR"`
 	TestResultDir string `env:"BITRISE_TEST_RESULT_DIR"`
@@ -53,6 +54,7 @@ func main() {
 }
 
 func exportResult(project gradle.Project, config Configs, started time.Time) {
+	// HTML RESULTS
 	fmt.Println()
 	logger.Infof("Export HTML results:")
 	fmt.Println()
@@ -65,6 +67,21 @@ func exportResult(project gradle.Project, config Configs, started time.Time) {
 	if err := exportArtifacts(config.DeployDir, reports); err != nil {
 		failf("Export outputs: failed to export reports, error: %v", err)
 	}
+
+	// XML RESULTS
+	fmt.Println()
+	logger.Infof("Export XML results:")
+	fmt.Println()
+
+	results, err := getArtifacts(project, started, config.XMLResultDirPattern, true, true)
+	if err != nil {
+		failf("Export outputs: failed to find results, error: %v", err)
+	}
+
+	if err := exportArtifacts(config.DeployDir, results); err != nil {
+		failf("Export outputs: failed to export results, error: %v", err)
+	}
+
 }
 
 func createConfig() Configs {
