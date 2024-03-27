@@ -63,7 +63,7 @@ func exportResult(config Configs, variantMap gradle.Variants) {
 	logger.Infof("Export HTML results:")
 	fmt.Println()
 
-	htmlArtifacts := getArtifacts(config, variantMap, config.HTMLResultDirPattern)
+	htmlArtifacts, _ := getArtifacts(config, variantMap, config.HTMLResultDirPattern)
 	if htmlArtifacts != nil {
 		exportArtifacts(config.DeployDir, reports)
 	}
@@ -73,7 +73,7 @@ func exportResult(config Configs, variantMap gradle.Variants) {
 	logger.Infof("Export XML results:")
 	fmt.Println()
 
-	xmlArtifacts := getArtifacts(config, variantMap, config.XMLResultDirPattern)
+	xmlArtifacts, _ := getArtifacts(config, variantMap, config.XMLResultDirPattern)
 	if xmlArtifacts != nil {
 		exportArtifacts(config.DeployDir, results)
 	}
@@ -83,7 +83,7 @@ func exportResult(config Configs, variantMap gradle.Variants) {
 	logger.Infof("Export Snapshot results:")
 	fmt.Println()
 
-	snapshotArtifacts := getArtifacts(config, variantMap, config.SnapshotDeltaDirPattern)
+	snapshotArtifacts, _ := getArtifacts(config, variantMap, config.SnapshotDeltaDirPattern)
 	if snapshotResult != nil {
 		exportArtifacts(config.DeployDir, snapshotArtifacts)
 	}
