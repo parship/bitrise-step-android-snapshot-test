@@ -229,28 +229,14 @@ func getArtifacts(config Configs, variantsMap gradle.Variants, pattern string) (
 	for module := range variantsMap {
 		modulePath := strings.Replace(module, ":", "/", -1)
 		fullPath := config.ProjectLocation + "/" + modulePath + "/" + pattern
-		fmt.Println("Checking: " + fullPath)
 
-		name, err := extractArtifactName(config.ProjectLocation, fullPath)
+		name := strings.Replace(module, ":", "-", -1)
 		if err == nil {
 			a = append(a, gradle.Artifact{Name: name, Path: fullPath})
 		}
 	}
 
 	return a, nil
-}
-
-func extractArtifactName(projectPath string, path string) (string, error) {
-	relPath, err := filepath.Rel(projectPath, path)
-	if err != nil {
-		return "", err
-	}
-
-	fileName := filepath.Base(relPath)
-
-	fileName = strings.Split(relPath, "/")[0] + "-" + fileName
-
-	return fileName, nil
 }
 
 func exportArtifacts(deployDir string, artifacts []gradle.Artifact) error {
