@@ -231,7 +231,7 @@ func getArtifacts(config Configs, variantsMap gradle.Variants, pattern string) (
 		fullPath := config.ProjectLocation + "/" + modulePath + "/" + pattern
 		moduleName := strings.Replace(module, ":", "-", -1)
 
-		name := extractArtifactName(config.ProjectLocation, fullPath, moduleName)
+		name, err := extractArtifactName(config.ProjectLocation, fullPath, moduleName)
 		if err == nil {
 			a = append(a, gradle.Artifact{Name: name, Path: fullPath})
 		}
