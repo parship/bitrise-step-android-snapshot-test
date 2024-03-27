@@ -63,13 +63,9 @@ func exportResult(config Configs, variantMap gradle.Variants) {
 	logger.Infof("Export HTML results:")
 	fmt.Println()
 
-	reports, err := getArtifacts(config, variantMap, config.HTMLResultDirPattern)
-	if err != nil {
-		failf("Export outputs: failed to find reports, error: %v", err)
-	}
-
-	if err := exportArtifacts(config.DeployDir, reports); err != nil {
-		failf("Export outputs: failed to export reports, error: %v", err)
+	htmlArtifacts := getArtifacts(config, variantMap, config.HTMLResultDirPattern)
+	if htmlArtifacts != nil {
+		exportArtifacts(config.DeployDir, reports)
 	}
 
 	// XML RESULTS
@@ -77,13 +73,9 @@ func exportResult(config Configs, variantMap gradle.Variants) {
 	logger.Infof("Export XML results:")
 	fmt.Println()
 
-	results, err := getArtifacts(config, variantMap, config.XMLResultDirPattern)
-	if err != nil {
-		failf("Export outputs: failed to find results, error: %v", err)
-	}
-
-	if err := exportArtifacts(config.DeployDir, results); err != nil {
-		failf("Export outputs: failed to export results, error: %v", err)
+	xmlArtifacts := getArtifacts(config, variantMap, config.XMLResultDirPattern)
+	if xmlArtifacts != nil {
+		exportArtifacts(config.DeployDir, results)
 	}
 
 	// SNAPSHOT RESULTS
@@ -91,15 +83,10 @@ func exportResult(config Configs, variantMap gradle.Variants) {
 	logger.Infof("Export Snapshot results:")
 	fmt.Println()
 
-	snapshotResult, err := getArtifacts(config, variantMap, config.SnapshotDeltaDirPattern)
+	snapshotArtifacts := getArtifacts(config, variantMap, config.SnapshotDeltaDirPattern)
 	if snapshotResult != nil {
-		failf("Export outputs: failed to find results, error: %v", err)
+		exportArtifacts(config.DeployDir, snapshotArtifacts)
 	}
-
-	if err := exportArtifacts(config.DeployDir, results); err != nil {
-		failf("Export outputs: failed to export results, error: %v", err)
-	}
-
 }
 
 func createConfig() Configs {
