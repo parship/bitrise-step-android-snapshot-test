@@ -65,7 +65,7 @@ func exportResult(config Configs, variantMap gradle.Variants) {
 
 	htmlArtifacts, _ := getArtifacts(config, variantMap, config.HTMLResultDirPattern)
 	if htmlArtifacts != nil {
-		exportArtifacts(config.DeployDir, reports)
+		exportArtifacts(config.DeployDir, htmlArtifacts)
 	}
 
 	// XML RESULTS
@@ -75,7 +75,7 @@ func exportResult(config Configs, variantMap gradle.Variants) {
 
 	xmlArtifacts, _ := getArtifacts(config, variantMap, config.XMLResultDirPattern)
 	if xmlArtifacts != nil {
-		exportArtifacts(config.DeployDir, results)
+		exportArtifacts(config.DeployDir, xmlArtifacts)
 	}
 
 	// SNAPSHOT RESULTS
