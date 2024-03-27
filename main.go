@@ -84,7 +84,7 @@ func exportResult(config Configs, variantMap gradle.Variants) {
 	fmt.Println()
 
 	snapshotArtifacts, _ := getArtifacts(config, variantMap, config.SnapshotDeltaDirPattern)
-	if snapshotResult != nil {
+	if snapshotArtifacts != nil {
 		exportArtifacts(config.DeployDir, snapshotArtifacts)
 	}
 }
