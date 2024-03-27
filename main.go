@@ -77,7 +77,7 @@ func exportResult(config Configs, variantMap gradle.Variants) {
 	logger.Infof("Export XML results:")
 	fmt.Println()
 
-	results, err := getArtifacts(variantMap, project, started, config.XMLResultDirPattern, true, true)
+	results, err := getArtifacts(config, variantMap, config.XMLResultDirPattern)
 	if err != nil {
 		failf("Export outputs: failed to find results, error: %v", err)
 	}
@@ -91,7 +91,7 @@ func exportResult(config Configs, variantMap gradle.Variants) {
 	logger.Infof("Export Snapshot results:")
 	fmt.Println()
 
-	snapshotResult, err := getArtifacts(variantMap, project, started, config.SnapshotDeltaDirPattern, true, true)
+	snapshotResult, err := getArtifacts(config, variantMap, config.SnapshotDeltaDirPattern)
 	if snapshotResult != nil {
 		failf("Export outputs: failed to find results, error: %v", err)
 	}
