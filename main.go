@@ -109,20 +109,22 @@ func exportResult(config Configs, variantMap gradle.Variants) {
 
 		var xmlArtifacts []gradle.Artifact
 
-		for m, v := range variantMap {
+		for m, variants := range variantMap {
 			modulePath := strings.Replace(m, ":", "/", -1)
+			pathToModule := config.ProjectLocation + "/" + modulePath + "/"
 
-			for _, v2 := range v {
-				xmlPath := config.ProjectLocation + "/" + modulePath + "/" + config.XMLResultDirPattern + "/test" + v2 + "UnitTest"
-				fmt.Println(xmlPath)
+			for _, variant := range variants {
+				xmlPath := pathToModule + config.XMLResultDirPattern + "/test" + variant + "UnitTest"
 
 				artifacts, _ := findArtifacts(xmlPath, "*.xml", true)
-
-				fmt.Println(artifacts)
-
 				xmlArtifacts = append(xmlArtifacts, artifacts...)
 			}
 
+			failurePath := pathToModule + config.SnapshotDeltaDirPattern
+
+			deltaArtifacts, _ := findArtifacts(failurePath, "delta-*.png", true)
+
+			fmt.Println(deltaArtifacts)
 		}
 
 		lastOtherDirIdx := -1
