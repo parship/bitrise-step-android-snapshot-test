@@ -50,9 +50,9 @@ func main() {
 		command := testTask.GetCommand(variants, args...)
 
 		testErr := runTest(command)
-	
+
 		exportResult(config, variants)
-	
+
 		// FINISH
 		if testErr != nil {
 			os.Exit(1)
@@ -80,9 +80,8 @@ func exportResult(config Configs, variantMap gradle.Variants) {
 
 	xmlArtifacts, _ := getArtifacts(config, variantMap, config.XMLResultDirPattern)
 
-
 	for artifact := range xmlArtifacts {
-		fmt.Println(artifact.name)
+		fmt.Println(artifact)
 	}
 
 	if xmlArtifacts != nil {
@@ -98,6 +97,7 @@ func exportResult(config Configs, variantMap gradle.Variants) {
 	if snapshotArtifacts != nil {
 		exportArtifacts(config.DeployDir, snapshotArtifacts)
 	}
+}
 
 // 	// Test Addon
 // 	if config.TestResultDir != "" {
