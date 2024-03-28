@@ -46,15 +46,19 @@ func main() {
 
 	variants := getVariants(config, *testTask, args)
 
-	command := testTask.GetCommand(variants, args...)
+	if len(variants) > 0 {
+		command := testTask.GetCommand(variants, args...)
 
-	testErr := runTest(command)
-
-	exportResult(config, variants)
-
-	// FINISH
-	if testErr != nil {
-		os.Exit(1)
+		testErr := runTest(command)
+	
+		exportResult(config, variants)
+	
+		// FINISH
+		if testErr != nil {
+			os.Exit(1)
+		}
+	} else {
+		logger.Errorf("No buildable variants found. Skipping snapshot tests!")
 	}
 }
 
