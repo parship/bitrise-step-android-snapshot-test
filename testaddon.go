@@ -52,6 +52,9 @@ func ExportArtifact(path, baseDir, uniqueDir string) error {
 	if _, err := os.Stat(filepath.Join(exportDir, ResultDescriptorFileName)); os.IsNotExist(err) {
 		m := map[string]string{"test-name": uniqueDir}
 		data, err := json.Marshal(m)
+
+		fmt.Println(data)
+
 		if err != nil {
 			return fmt.Errorf("create test info descriptor: json marshal data (%s): %s", m, err)
 		}
