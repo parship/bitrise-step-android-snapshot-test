@@ -93,7 +93,6 @@ func exportResult(config Configs, variantMap gradle.Variants) {
 func createConfig() Configs {
 	var config Configs
 
-	fmt.Println(config)
 	if err := stepconf.Parse(&config); err != nil {
 		failf("Process config: couldn't create step config: %v\n", err)
 	}
