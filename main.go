@@ -23,6 +23,7 @@ type Configs struct {
 	HTMLResultDirPattern    string `env:"report_path_pattern"`
 	XMLResultDirPattern     string `env:"result_path_pattern"`
 	SnapshotDeltaDirPattern string `env:"delta_path_pattern"`
+	SnapshotTask            string `env:"task"`
 	Variant                 string `env:"variant"`
 	Module                  string `env:"module"`
 	Arguments               string `env:"arguments"`
@@ -39,7 +40,7 @@ func main() {
 
 	project := getProject(config)
 
-	testTask := project.GetTask("verifySnapshots")
+	testTask := project.GetTask(config.SnapshotTask)
 
 	args := getArgs(config)
 

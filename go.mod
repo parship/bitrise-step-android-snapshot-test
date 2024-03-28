@@ -1,4 +1,4 @@
-module github.com/parship/bitrise-step-android-paparazzi-test
+module github.com/parship/bitrise-step-android-snapshot-test
 
 go 1.16
 

@@ -1,12 +1,12 @@
 title: |-
-  Android Paparazzi
+  Android Snapshot Tests
 summary: |
-  This step runs your Android project's paparazzi tests.
+  This step runs your Android project's snapshot tests.
 description: |
-  This step runs your Android project's paparazzi tests.
-website: https://parship.de
-source_code_url: https://parship.de
-support_url: https://parship.de
+  This step runs your Android project's snapshot tests.
+website: https://github.com/parship/bitrise-step-android-snapshot-test
+source_code_url: https://github.com/parship/bitrise-step-android-snapshot-test
+support_url: https://github.com/parship/bitrise-step-android-snapshot-test
 
 project_type_tags:
   - android
@@ -16,7 +16,7 @@ type_tags:
 
 toolkit:
   go:
-    package_name: github.com/parship/bitrise-step-android-paparazzi-test
+    package_name: github.com/parship/bitrise-step-android-snapshot-test
 
 inputs:
   - project_location: $BITRISE_SOURCE_DIR
@@ -24,6 +24,15 @@ inputs:
       title: Project Location
       summary: "The root directory of your android project, for example, where your root build gradle file exists (also gradlew, settings.gradle, etc...)"
       description: "The root directory of your android project, for example, where your root build gradle file exists (also gradlew, settings.gradle, etc...)"
+      is_required: true
+
+  - task: ""
+    opts:
+      title: Task
+      summary: |
+        Set the gradle task which runs your snapshot tests.
+      description: |
+        Set the gradle task which runs your snapshot tests. This could verifyPaparazzi for example.
       is_required: true
 
   - module: ""
@@ -75,7 +84,7 @@ inputs:
         and the result files will be deployed to the Ship Addon.
       is_required: true
 
-  - delta_path_pattern: "build/paparazzi/failures"
+  - delta_path_pattern: ""
     opts:
       category: Options
       title: Local snapshot test failure directory pattern
