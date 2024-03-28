@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
@@ -63,89 +64,93 @@ func main() {
 }
 
 func exportResult(config Configs, variantMap gradle.Variants) {
-	// HTML RESULTS
-	fmt.Println()
-	logger.Infof("Export HTML results:")
-	fmt.Println()
+	// // HTML RESULTS
+	// fmt.Println()
+	// logger.Infof("Export HTML results:")
+	// fmt.Println()
 
-	htmlArtifacts, _ := getArtifacts(config, variantMap, config.HTMLResultDirPattern)
-	if htmlArtifacts != nil {
-		exportArtifacts(config.DeployDir, htmlArtifacts)
-	}
+	// htmlArtifacts, _ := getArtifacts(config, variantMap, config.HTMLResultDirPattern)
+	// if htmlArtifacts != nil {
+	// 	exportArtifacts(config.DeployDir, htmlArtifacts)
+	// }
 
-	// XML RESULTS
-	fmt.Println()
-	logger.Infof("Export XML results:")
-	fmt.Println()
+	// // XML RESULTS
+	// fmt.Println()
+	// logger.Infof("Export XML results:")
+	// fmt.Println()
 
-	xmlArtifacts, _ := getArtifacts(config, variantMap, config.XMLResultDirPattern)
+	// xmlArtifacts, _ := getArtifacts(config, variantMap, config.XMLResultDirPattern)
 
-	for artifact := range xmlArtifacts {
-		fmt.Println(artifact)
-	}
+	// for artifact := range xmlArtifacts {
+	// 	fmt.Println(artifact)
+	// }
 
-	if xmlArtifacts != nil {
-		exportArtifacts(config.DeployDir, xmlArtifacts)
-	}
+	// if xmlArtifacts != nil {
+	// 	exportArtifacts(config.DeployDir, xmlArtifacts)
+	// }
 
-	// SNAPSHOT RESULTS
-	fmt.Println()
-	logger.Infof("Export Snapshot results:")
-	fmt.Println()
+	// // SNAPSHOT RESULTS
+	// fmt.Println()
+	// logger.Infof("Export Snapshot results:")
+	// fmt.Println()
 
-	snapshotArtifacts, _ := getArtifacts(config, variantMap, config.SnapshotDeltaDirPattern)
-	if snapshotArtifacts != nil {
-		exportArtifacts(config.DeployDir, snapshotArtifacts)
+	// snapshotArtifacts, _ := getArtifacts(config, variantMap, config.SnapshotDeltaDirPattern)
+	// if snapshotArtifacts != nil {
+	// 	exportArtifacts(config.DeployDir, snapshotArtifacts)
+	// }
+
+	// Test Addon
+	if config.TestResultDir != "" {
+		// Test Addon is turned on
+		fmt.Println()
+		logger.Infof("Export XML results for test addon:")
+		fmt.Println()
+
+		xmlResultFilePattern := config.XMLResultDirPattern
+		if !strings.HasSuffix(xmlResultFilePattern, "*.xml") {
+			xmlResultFilePattern += "*.xml"
+		}
+
+		resultXMLs, err := getArtifacts(config, variantMap, xmlResultFilePattern)
+
+		for artifact := range resultXMLs {
+			fmt.Println(artifact)
+		}
+
+		if err != nil {
+			logger.Warnf("Failed to find test XML test results, error: %s", err)
+		} else {
+			lastOtherDirIdx := -1
+			for _, artifact := range resultXMLs {
+				lastOtherDirIdx = tryExportTestAddonArtifact(artifact.Path, config.TestResultDir, lastOtherDirIdx)
+			}
+		}
 	}
 }
 
-// 	// Test Addon
-// 	if config.TestResultDir != "" {
-// 		// Test Addon is turned on
-// 		fmt.Println()
-// 		logger.Infof("Export XML results for test addon:")
-// 		fmt.Println()
+func tryExportTestAddonArtifact(artifactPth, outputDir string, lastOtherDirIdx int) int {
+	dir := getExportDir(artifactPth)
 
-// 		xmlResultFilePattern := config.XMLResultDirPattern
-// 		if !strings.HasSuffix(xmlResultFilePattern, "*.xml") {
-// 			xmlResultFilePattern += "*.xml"
-// 		}
+	if dir == OtherDirName {
+		// start indexing other dir name, to avoid overrideing it
+		// e.g.: other, other-1, other-2
+		lastOtherDirIdx++
+		if lastOtherDirIdx > 0 {
+			dir = dir + "-" + strconv.Itoa(lastOtherDirIdx)
+		}
+	}
 
-// 		resultXMLs, err := getArtifacts(gradleProject, started, xmlResultFilePattern, false, false)
-// 		if err != nil {
-// 			logger.Warnf("Failed to find test XML test results, error: %s", err)
-// 		} else {
-// 			lastOtherDirIdx := -1
-// 			for _, artifact := range resultXMLs {
-// 				lastOtherDirIdx = tryExportTestAddonArtifact(artifact.Path, config.TestResultDir, lastOtherDirIdx)
-// 			}
-// 		}
-// 	}
-// }
-
-// func tryExportTestAddonArtifact(artifactPth, outputDir string, lastOtherDirIdx int) int {
-// 	dir := getExportDir(artifactPth)
-
-// 	if dir == OtherDirName {
-// 		// start indexing other dir name, to avoid overrideing it
-// 		// e.g.: other, other-1, other-2
-// 		lastOtherDirIdx++
-// 		if lastOtherDirIdx > 0 {
-// 			dir = dir + "-" + strconv.Itoa(lastOtherDirIdx)
-// 		}
-// 	}
-
-// 	if err := testaddon.ExportArtifact(artifactPth, outputDir, dir); err != nil {
-// 		logger.Warnf("Failed to export test results for test addon: %s", err)
-// 	} else {
-// 		src := artifactPth
-// 		if rel, err := workDirRel(artifactPth); err == nil {
-// 			src = "./" + rel
-// 		}
-// 		logger.Printf("  Export [%s => %s]", src, filepath.Join("$BITRISE_TEST_RESULT_DIR", dir, filepath.Base(artifactPth)))
-// 	}
-// 	return lastOtherDirIdx
-// }
+	if err := ExportArtifact(artifactPth, outputDir, dir); err != nil {
+		logger.Warnf("Failed to export test results for test addon: %s", err)
+	} else {
+		src := artifactPth
+		if rel, err := workDirRel(artifactPth); err == nil {
+			src = "./" + rel
+		}
+		logger.Printf("  Export [%s => %s]", src, filepath.Join("$BITRISE_TEST_RESULT_DIR", dir, filepath.Base(artifactPth)))
+	}
+	return lastOtherDirIdx
+}
 
 func createConfig() Configs {
 	var config Configs
