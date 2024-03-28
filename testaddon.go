@@ -43,6 +43,9 @@ func generateTestInfoFile(dir string, data []byte) error {
 // ExportArtifact exports artifact found at path in directory uniqueDir,
 // rooted at baseDir.
 func ExportArtifact(path, baseDir, uniqueDir string) error {
+
+	fmt.Println("Exporting" + path)
+
 	exportDir := filepath.Join(baseDir, uniqueDir)
 
 	if err := os.MkdirAll(exportDir, os.ModePerm); err != nil {
@@ -53,7 +56,7 @@ func ExportArtifact(path, baseDir, uniqueDir string) error {
 		m := map[string]string{"test-name": uniqueDir}
 		data, err := json.Marshal(m)
 
-		fmt.Println(data)
+		fmt.Println(m)
 
 		if err != nil {
 			return fmt.Errorf("create test info descriptor: json marshal data (%s): %s", m, err)
