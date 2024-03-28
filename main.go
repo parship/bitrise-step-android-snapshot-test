@@ -16,6 +16,7 @@ import (
 	"github.com/bitrise-io/go-utils/pathutil"
 	"github.com/bitrise-io/go-utils/sliceutil"
 	"github.com/kballard/go-shellquote"
+	"github.com/ryanuber/go-glob"
 )
 
 // Configs ...
@@ -106,25 +107,29 @@ func exportResult(config Configs, variantMap gradle.Variants) {
 		logger.Infof("Export XML results for test addon:")
 		fmt.Println()
 
-		xmlResultFilePattern := config.XMLResultDirPattern
-		if !strings.HasSuffix(xmlResultFilePattern, "*.xml") {
-			xmlResultFilePattern += "/*.xml"
-		}
+		for m, v := range variantMap {
+			for _, v2 := range v {
+				xmlPath := config.ProjectLocation + "/" + m + "/test" + v2 + "UnitTest"
 
-		resultXMLs, err := getArtifacts(config, variantMap, xmlResultFilePattern)
-
-		for artifact := range resultXMLs {
-			fmt.Println(artifact)
-		}
-
-		if err != nil {
-			logger.Warnf("Failed to find test XML test results, error: %s", err)
-		} else {
-			lastOtherDirIdx := -1
-			for _, artifact := range resultXMLs {
-				lastOtherDirIdx = tryExportTestAddonArtifact(artifact.Path, config.TestResultDir, lastOtherDirIdx)
+				fmt.Println(xmlPath)
 			}
+
 		}
+
+		// resultXMLs, err := findArtifacts()
+
+		// for artifact := range resultXMLs {
+		// 	fmt.Println(artifact)
+		// }
+
+		// if err != nil {
+		// 	logger.Warnf("Failed to find test XML test results, error: %s", err)
+		// } else {
+		// 	lastOtherDirIdx := -1
+		// 	for _, artifact := range resultXMLs {
+		// 		lastOtherDirIdx = tryExportTestAddonArtifact(artifact.Path, config.TestResultDir, lastOtherDirIdx)
+		// 	}
+		// }
 	}
 }
 
@@ -326,4 +331,27 @@ func exportArtifacts(deployDir string, artifacts []gradle.Artifact) error {
 		}
 	}
 	return nil
+}
+
+// FindArtifacts ...
+func findArtifacts(folderPath string, pattern string, includeModuleInName bool) ([]gradle.Artifact, error) {
+	var a []gradle.Artifact
+	return a, filepath.Walk(folderPath, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			log.Warnf("failed to walk path: %s", err)
+			return nil
+		}
+
+		if info.IsDir() || !glob.Glob(pattern, path) {
+			return nil
+		}
+
+		name, err := extractArtifactName(folderPath, path, "test")
+		if err != nil {
+			return err
+		}
+
+		a = append(a, gradle.Artifact{Name: name, Path: path})
+		return nil
+	})
 }
