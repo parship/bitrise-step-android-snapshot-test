@@ -122,6 +122,8 @@ func exportResult(config Configs, variantMap gradle.Variants) {
 
 			failurePath := pathToModule + config.SnapshotDeltaDirPattern
 
+			fmt.Println("Looking for deltas: " + failurePath)
+
 			deltaArtifacts, _ := findArtifacts(failurePath, "delta-*.png", true)
 
 			fmt.Println(deltaArtifacts)
