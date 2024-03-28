@@ -136,3 +136,10 @@ func lowercaseFirstLetter(str string) string {
 	}
 	return ""
 }
+
+func parseModuleName(pthParts []string, testResultsPartIdx int) (string, error) {
+	if testResultsPartIdx < 2 {
+		return "", fmt.Errorf(`unknown path (%s): Local Unit Test task output dir should match <moduleName>/build/test-results`, filepath.Join(pthParts...))
+	}
+	return pthParts[testResultsPartIdx-2], nil
+}
