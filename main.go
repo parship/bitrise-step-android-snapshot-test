@@ -109,7 +109,10 @@ func getVariants(config Configs, task gradle.Task, args []string) gradle.Variant
 		failf("Run: failed to fetch variants, error: %s", err)
 	}
 
-	filteredVariants := filterVariants(config.Module, config.Variant, variants)
+	filteredVariants, err := filterVariants(config.Module, config.Variant, variants)
+	if err != nil {
+		failf("Run: failed to find buildable variants, error: %s", err)
+	}
 
 	logVariants(variants, filteredVariants)
 
@@ -173,7 +176,7 @@ func failf(f string, args ...interface{}) {
 	os.Exit(1)
 }
 
-func filterVariants(module, variant string, variantsMap gradle.Variants) gradle.Variants {
+func filterVariants(module, variant string, variantsMap gradle.Variants) (gradle.Variants, error) {
 	// if module set: drop all the other modules
 	if module != "" {
 		v, ok := variantsMap[module]
@@ -195,7 +198,7 @@ func filterVariants(module, variant string, variantsMap gradle.Variants) gradle.
 		}
 	}
 
-	return filteredVariants
+	return filteredVariants, nil
 }
 
 func workDirRel(pth string) (string, error) {
