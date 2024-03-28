@@ -116,7 +116,7 @@ func exportResult(config Configs, variantMap gradle.Variants) {
 			for _, variant := range variants {
 				xmlPath := pathToModule + config.XMLResultDirPattern + "/test" + variant + "UnitTest"
 
-				artifacts, _ := findArtifacts(xmlPath, "*.xml", true)
+				artifacts, _ := findArtifacts(xmlPath, "*.xml")
 				xmlArtifacts = append(xmlArtifacts, artifacts...)
 			}
 
@@ -124,7 +124,7 @@ func exportResult(config Configs, variantMap gradle.Variants) {
 
 			fmt.Println("Looking for deltas: " + failurePath)
 
-			deltaArtifacts, _ := findArtifacts(failurePath, "delta-*.png", true)
+			deltaArtifacts, _ := findArtifacts(failurePath, "*.png")
 
 			fmt.Println(deltaArtifacts)
 		}
@@ -337,7 +337,7 @@ func exportArtifacts(deployDir string, artifacts []gradle.Artifact) error {
 }
 
 // FindArtifacts ...
-func findArtifacts(folderPath string, pattern string, includeModuleInName bool) ([]gradle.Artifact, error) {
+func findArtifacts(folderPath string, pattern string) ([]gradle.Artifact, error) {
 	var a []gradle.Artifact
 	return a, filepath.Walk(folderPath, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
