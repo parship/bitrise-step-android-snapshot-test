@@ -79,6 +79,12 @@ func exportResult(config Configs, variantMap gradle.Variants) {
 	fmt.Println()
 
 	xmlArtifacts, _ := getArtifacts(config, variantMap, config.XMLResultDirPattern)
+
+
+	for artifact := range xmlArtifacts {
+		fmt.Println(artifact.name)
+	}
+
 	if xmlArtifacts != nil {
 		exportArtifacts(config.DeployDir, xmlArtifacts)
 	}
@@ -92,7 +98,54 @@ func exportResult(config Configs, variantMap gradle.Variants) {
 	if snapshotArtifacts != nil {
 		exportArtifacts(config.DeployDir, snapshotArtifacts)
 	}
-}
+
+// 	// Test Addon
+// 	if config.TestResultDir != "" {
+// 		// Test Addon is turned on
+// 		fmt.Println()
+// 		logger.Infof("Export XML results for test addon:")
+// 		fmt.Println()
+
+// 		xmlResultFilePattern := config.XMLResultDirPattern
+// 		if !strings.HasSuffix(xmlResultFilePattern, "*.xml") {
+// 			xmlResultFilePattern += "*.xml"
+// 		}
+
+// 		resultXMLs, err := getArtifacts(gradleProject, started, xmlResultFilePattern, false, false)
+// 		if err != nil {
+// 			logger.Warnf("Failed to find test XML test results, error: %s", err)
+// 		} else {
+// 			lastOtherDirIdx := -1
+// 			for _, artifact := range resultXMLs {
+// 				lastOtherDirIdx = tryExportTestAddonArtifact(artifact.Path, config.TestResultDir, lastOtherDirIdx)
+// 			}
+// 		}
+// 	}
+// }
+
+// func tryExportTestAddonArtifact(artifactPth, outputDir string, lastOtherDirIdx int) int {
+// 	dir := getExportDir(artifactPth)
+
+// 	if dir == OtherDirName {
+// 		// start indexing other dir name, to avoid overrideing it
+// 		// e.g.: other, other-1, other-2
+// 		lastOtherDirIdx++
+// 		if lastOtherDirIdx > 0 {
+// 			dir = dir + "-" + strconv.Itoa(lastOtherDirIdx)
+// 		}
+// 	}
+
+// 	if err := testaddon.ExportArtifact(artifactPth, outputDir, dir); err != nil {
+// 		logger.Warnf("Failed to export test results for test addon: %s", err)
+// 	} else {
+// 		src := artifactPth
+// 		if rel, err := workDirRel(artifactPth); err == nil {
+// 			src = "./" + rel
+// 		}
+// 		logger.Printf("  Export [%s => %s]", src, filepath.Join("$BITRISE_TEST_RESULT_DIR", dir, filepath.Base(artifactPth)))
+// 	}
+// 	return lastOtherDirIdx
+// }
 
 func createConfig() Configs {
 	var config Configs
