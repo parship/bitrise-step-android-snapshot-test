@@ -108,8 +108,10 @@ func exportResult(config Configs, variantMap gradle.Variants) {
 		fmt.Println()
 
 		for m, v := range variantMap {
+			modulePath := strings.Replace(m, ":", "/", -1)
+
 			for _, v2 := range v {
-				xmlPath := config.ProjectLocation + "/" + m + "/test" + v2 + "UnitTest"
+				xmlPath := config.ProjectLocation + "/" + modulePath + config.XMLResultDirPattern + "/test" + v2 + "UnitTest"
 
 				fmt.Println(xmlPath)
 			}
