@@ -107,6 +107,8 @@ func exportResult(config Configs, variantMap gradle.Variants) {
 		logger.Infof("Export XML results for test addon:")
 		fmt.Println()
 
+		var xmlArtifacts []gradle.Artifact
+
 		for m, v := range variantMap {
 			modulePath := strings.Replace(m, ":", "/", -1)
 
@@ -117,24 +119,16 @@ func exportResult(config Configs, variantMap gradle.Variants) {
 				artifacts, _ := findArtifacts(xmlPath, "*.xml", true)
 
 				fmt.Println(artifacts)
+
+				xmlArtifacts = append(xmlArtifacts, artifacts...)
 			}
 
 		}
 
-		// resultXMLs, err := findArtifacts()
-
-		// for artifact := range resultXMLs {
-		// 	fmt.Println(artifact)
-		// }
-
-		// if err != nil {
-		// 	logger.Warnf("Failed to find test XML test results, error: %s", err)
-		// } else {
-		// 	lastOtherDirIdx := -1
-		// 	for _, artifact := range resultXMLs {
-		// 		lastOtherDirIdx = tryExportTestAddonArtifact(artifact.Path, config.TestResultDir, lastOtherDirIdx)
-		// 	}
-		// }
+		lastOtherDirIdx := -1
+		for _, artifact := range xmlArtifacts {
+			lastOtherDirIdx = tryExportTestAddonArtifact(artifact.Path, config.TestResultDir, lastOtherDirIdx)
+		}
 	}
 }
 
