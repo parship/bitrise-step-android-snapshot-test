@@ -192,7 +192,7 @@ func filterVariants(module, variant string, variantsMap gradle.Variants) (gradle
 	filteredVariants := gradle.Variants{}
 	for m, variants := range variantsMap {
 		for _, v := range variants {
-			if v == variant {
+			if strings.ToLower(v) == strings.ToLower(variant) {
 				filteredVariants[m] = append(filteredVariants[m], v)
 			}
 		}
