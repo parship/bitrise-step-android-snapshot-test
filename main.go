@@ -108,7 +108,7 @@ func exportResult(config Configs, variantMap gradle.Variants) {
 
 		xmlResultFilePattern := config.XMLResultDirPattern
 		if !strings.HasSuffix(xmlResultFilePattern, "*.xml") {
-			xmlResultFilePattern += "*.xml"
+			xmlResultFilePattern += "/*.xml"
 		}
 
 		resultXMLs, err := getArtifacts(config, variantMap, xmlResultFilePattern)
